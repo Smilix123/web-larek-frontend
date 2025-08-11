@@ -33,7 +33,7 @@ export interface IBasket {
 	total: number;
 }
 
-export interface IAppState {
+export interface IWebLarekState {
 	catalog: IProduct[];
 	basket: IProduct[];
 	order: IOrder;

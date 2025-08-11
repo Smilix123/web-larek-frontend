@@ -1,13 +1,13 @@
 import { Api } from './base/api';
 import { IOrder, IProduct, IProductResponse } from '../types';
 
-export interface ILarekAPI {
+export interface IWebLarekAPI {
 	getProducts(): Promise<IProductResponse>;
 	getProductById(id: string): Promise<IProduct>;
 	setOrder(order: IOrder): Promise<IOrder>;
 }
 
-export class LarekAPI extends Api implements ILarekAPI {
+export class WebLarekAPI extends Api implements IWebLarekAPI {
 	readonly cdn: string;
 
 	constructor(cdn: string, baseUrl: string, options?: RequestInit) {
