@@ -50,9 +50,7 @@ export function ensureElement<T extends HTMLElement>(
 	throw new Error('Unknown selector element');
 }
 
-export function cloneTemplate<T extends HTMLElement>(
-	query: string | HTMLTemplateElement
-): T {
+export function cloneTemplate<T extends HTMLElement>(query: string | HTMLTemplateElement): T {
 	const template = ensureElement(query) as HTMLTemplateElement;
 	return template.content.firstElementChild.cloneNode(true) as T;
 }
@@ -75,9 +73,7 @@ export function getObjectProperties(
 	obj: object,
 	filter?: (name: string, prop: PropertyDescriptor) => boolean
 ): string[] {
-	return Object.entries(
-		Object.getOwnPropertyDescriptors(Object.getPrototypeOf(obj))
-	)
+	return Object.entries(Object.getOwnPropertyDescriptors(Object.getPrototypeOf(obj)))
 		.filter(([name, prop]: [string, PropertyDescriptor]) =>
 			filter ? filter(name, prop) : name !== 'constructor'
 		)
@@ -152,6 +148,39 @@ export function createElement<T extends HTMLElement>(
 	return element;
 }
 
-export function formatNumber(x: number, sep = ' ') {
-	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+/**
+ * Форматирует число в строку с сепаратором, если оно больше или равно 10000\
+ * 1000 {number} -> 1000 {string}\
+ * 150000 -> 150 000
+ * @param value {number} число для преобразования
+ * @param sep сепаратор (по умолчанию " ")
+ */
+export function formatNumberWithSeparator(value: number, sep = ' '): string {
+	if (value >= 10000) {
+		return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+	}
+	return String(value);
+}
+
+/**
+ * Заменяет расширение .svg на .png в URL изображения
+ */
+export function replaceSvgWithPng(url: string): string {
+	// Находим позиции параметров запроса и якоря
+	const queryIndex = url.indexOf('?');
+	const hashIndex = url.indexOf('#');
+
+	// Определяем, где начинаются параметры (если есть)
+	let paramsStart = url.length;
+	if (queryIndex !== -1) paramsStart = Math.min(paramsStart, queryIndex);
+	if (hashIndex !== -1) paramsStart = Math.min(paramsStart, hashIndex);
+
+	// Разделяем URL на путь и параметры
+	const path = url.substring(0, paramsStart);
+	const params = url.substring(paramsStart);
+
+	// Заменяем .svg на .png в конце пути (регистронезависимо)
+	const newPath = path.replace(/\.svg$/i, '.png');
+
+	return newPath + params;
 }

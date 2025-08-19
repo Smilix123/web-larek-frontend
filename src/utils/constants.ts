@@ -9,21 +9,22 @@ export const settings = {
 		address: 'Необходимо указать адрес',
 		payment: 'Необходимо выбрать способ оплаты',
 	},
-	noPrice: 'Бесценно',
+	card: {
+		noPrice: 'Бесценно',
+	},
 	buyButtonValues: {
 		add: 'Купить',
 		delete: 'Удалить из корзины',
 		disabled: 'Недоступно',
 	},
-	success: `Списано {sum} синапсов`,
 	basket: {
 		empty: 'Корзина пуста',
 	},
 	categories: {
 		'софт-скил': 'card__category_soft',
-		'другое': 'card__category_other',
-		'дополнительное': 'card__category_additional',
-		'кнопка': 'card__category_button',
+		другое: 'card__category_other',
+		дополнительное: 'card__category_additional',
+		кнопка: 'card__category_button',
 		'хард-скил': 'card__category_hard',
 	},
 };
