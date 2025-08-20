@@ -87,7 +87,7 @@ interface IProductsCatalog {
 }
 ```
 
-### Интерфейс `IWebLarekState` - главный интерфейс состояние приложения
+### Интерфейс `IWebLarekState` - главный интерфейс состояния приложения
 
 ```typescript
 interface IWebLarekState {
