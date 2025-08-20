@@ -24,6 +24,26 @@ export interface IProductsCatalog {
 	items: IProduct[]; // массив продуктов
 }
 
+export interface IWebLarekState {
+	catalog: IProduct[]; // массив товаров
+	order: IOrder; // заказ
+	preview: id | null; // идентификатор карточки для просмотра
+	formErrors: FormErrors; // ошибки при валидации
+	setProducts(items: IProduct[]): void; // устанавливает объект с карточками
+	getProduct(id: id): IProduct; // получает объект товара по его id
+	getTotal(): number; // получает сумму стоимости товаров в корзине
+	getProductsCount(): CardsCount; // получает количество товаров в корзине
+	addToBasket(id: id): void; // добавляет товар в корзину
+	deleteFromBasket(id: id): void; // удаляет товар из корзины
+	clearBasket(): void; // очищает корзину
+	inBasket(id: id): boolean; // проверяет есть ли в корзине товар по его идентификатору
+	validateOrder(): void; // валидация полей формы способа оплаты и адреса (метод оплаты и адрес)
+	validateContacts(): void; // валидация полей формы контактов (email и телефон)
+	setOrderField(field: keyof TOrderForm, value: string): void; // устанавливает данные в поля ввода формы способа оплаты и адреса
+	setContactsField(field: keyof TContactsForm, value: string): void; // устанавливает данные в поля ввода формы контактов
+	setPreview(item: IProduct): void; // устанавливает карточку для показа
+}
+
 export interface IBasket {
 	items: HTMLElement[] | string; // каталог товаров или надпись "Корзина пуста"
 	total: number; // общая сумма товаров
