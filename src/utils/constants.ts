@@ -7,7 +7,7 @@ export const CDN_URL = `https://larek-api.nomoreparties.co/content/weblarek`;
 // export const CDN_URL = `${process.env.API_ORIGIN}/content/weblarek`;
 
 export const settings = {
-	currency: 'синапсов', // название валюты в род.падеже
+	currency: 'синапсов', // название валюты в родительном падеже
 	formErrors: {
 		phone: 'Необходимо указать телефон',
 		email: 'Необходимо указать email',
