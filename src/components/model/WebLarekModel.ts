@@ -1,4 +1,11 @@
-import { CardsCount, FormErrors, id, IWebLarekState, TContactsForm, TOrderForm } from './../../types/index';
+import {
+	CardsCount,
+	FormErrors,
+	id,
+	IWebLarekState,
+	TContactsForm,
+	TOrderForm,
+} from './../../types/index';
 import { IOrder, IProduct } from '../../types';
 import { Model } from './base/Model';
 import { settings } from '../../utils/constants';

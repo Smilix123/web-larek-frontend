@@ -60,7 +60,7 @@ events.on<IProductsCatalog>('products:changed', () => {
 			image: item.image,
 			description: item.description,
 			price: item.price,
-			category: item.category as CardCategory,
+			category: item.category,
 		});
 	});
 
