@@ -5,13 +5,30 @@ import { WebLarekState } from './components/model/WebLarekModel';
 import { Page } from './components/view/Page';
 import { WebLarekAPI } from './components/api/WebLarekApi';
 import './scss/styles.scss';
-import { CardCategory, IProduct, IProductsCatalog, TContactsForm, TOrderForm } from './types';
+import { IProduct, IProductsCatalog, TContactsForm, TOrderForm } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { Order } from './components/view/Order';
 import { Contacts } from './components/view/Contacts';
 import { Card } from './components/view/Card';
 import { Success } from './components/view/Success';
+
+// Enum для всех событий приложения
+enum Events {
+	ProductsChanged = 'products:changed',
+	CardSelect = 'card:select',
+	PreviewChanged = 'preview:changed',
+	BasketChanged = 'basket:changed',
+	BasketOpen = 'basket:open',
+	BasketDelete = 'basket:delete',
+	OrderOpen = 'order:open',
+	OrderSubmit = 'order:submit',
+	ContactsSubmit = 'contacts:submit',
+	ModalOpen = 'modal:open',
+	ModalClose = 'modal:close',
+	OrderFormErrorsChange = 'orderFormErrors:change',
+	ContactsFormErrorsChange = 'contactsFormErrors:change',
+}
 
 // Инициализация api
 const api = new WebLarekAPI(CDN_URL, API_URL);
@@ -23,7 +40,6 @@ const events = new EventEmitter();
 const appData = new WebLarekState({}, events);
 
 // Чтобы мониторить все события, для отладки
-
 /* events.onAll(({ eventName, data }) => {
 	console.log(eventName, data);
 }); */
@@ -49,10 +65,10 @@ const basket = new Basket(cloneTemplate(basketTemplate), events);
 // Бизнес-логика
 
 // изменение данных в каталоге товаров
-events.on<IProductsCatalog>('products:changed', () => {
+events.on<IProductsCatalog>(Events.ProductsChanged, () => {
 	page.catalogContainer = appData.catalog.map((item) => {
 		const card = new Card(cloneTemplate(cardCatalogTemplate), {
-			onClick: () => events.emit('card:select', item),
+			onClick: () => events.emit(Events.CardSelect, item),
 		});
 		return card.render({
 			id: item.id,
@@ -68,14 +84,14 @@ events.on<IProductsCatalog>('products:changed', () => {
 });
 
 // реакция на клик на карточку каталога на странице
-events.on('card:select', (item: IProduct) => {
+events.on(Events.CardSelect, (item: IProduct) => {
 	appData.setPreview(item);
 });
 
-events.on('preview:changed', (item: IProduct) => {
+events.on(Events.PreviewChanged, (item: IProduct) => {
 	const card = new Card(cloneTemplate(cardPreviewTemplate), {
 		onClick: () => {
-			events.emit('basket:changed', item);
+			events.emit(Events.BasketChanged, item);
 			modal.close();
 		},
 	});
@@ -87,17 +103,17 @@ events.on('preview:changed', (item: IProduct) => {
 			image: item.image,
 			description: item.description,
 			price: item.price,
-			category: item.category as CardCategory,
+			category: item.category,
 		}),
 	});
 });
 
 // открыть модалку с корзиной
-events.on('basket:open', () => {
+events.on(Events.BasketOpen, () => {
 	basket.items = appData.order.items.map((id, index) => {
 		const item = appData.getProduct(id);
 		const card = new Card(cloneTemplate(cardBasketTemplate), {
-			onClick: () => events.emit('basket:delete', item),
+			onClick: () => events.emit(Events.BasketDelete, item),
 		});
 		return card.render({
 			id: item.id,
@@ -114,7 +130,7 @@ events.on('basket:open', () => {
 });
 
 // реакция на клик "Купить" или "Удалить из корзины" в модальном окне просмотра продукта
-events.on('basket:changed', (item: IProduct) => {
+events.on(Events.BasketChanged, (item: IProduct) => {
 	if (appData.inBasket(item.id)) {
 		appData.deleteFromBasket(item.id);
 	} else {
@@ -123,13 +139,13 @@ events.on('basket:changed', (item: IProduct) => {
 });
 
 // реакция на клик на иконку удаления продукта в корзине
-events.on('basket:delete', (item: IProduct) => {
+events.on(Events.BasketDelete, (item: IProduct) => {
 	appData.deleteFromBasket(item.id);
-	events.emit('basket:open');
+	events.emit(Events.BasketOpen);
 });
 
 // реакция на клик на кнопку "Оформить" в корзине
-events.on('order:open', () => {
+events.on(Events.OrderOpen, () => {
 	modal.render({
 		content: order.render({
 			payment: appData.order.payment,
@@ -146,7 +162,7 @@ events.on(/^order\..*:change/, (data: { field: keyof TOrderForm; value: string }
 });
 
 // реакция на изменение состояния валидации формы выбора оплаты и ввода адреса доставки
-events.on('orderFormErrors:change', (errors: Partial<TOrderForm>) => {
+events.on(Events.OrderFormErrorsChange, (errors: Partial<TOrderForm>) => {
 	order.valid = Object.keys(errors).length > 0 ? false : true;
 	order.errors = Object.values(errors)
 		.filter((i) => !!i)
@@ -154,7 +170,7 @@ events.on('orderFormErrors:change', (errors: Partial<TOrderForm>) => {
 });
 
 // реакция на кнопку "Далее" в модальном окне первого шага оформления заказа
-events.on('order:submit', () => {
+events.on(Events.OrderSubmit, () => {
 	modal.render({
 		content: contacts.render({
 			phone: appData.order.phone,
@@ -171,7 +187,7 @@ events.on(/^contacts\..*:change/, (data: { field: keyof TContactsForm; value: st
 });
 
 // реакция на изменение состояния валидации формы ввода номера телефона и email
-events.on('contactsFormErrors:change', (errors: Partial<TContactsForm>) => {
+events.on(Events.ContactsFormErrorsChange, (errors: Partial<TContactsForm>) => {
 	contacts.valid = Object.keys(errors).length > 0 ? false : true;
 	contacts.errors = Object.values(errors)
 		.filter((i) => !!i)
@@ -179,7 +195,7 @@ events.on('contactsFormErrors:change', (errors: Partial<TContactsForm>) => {
 });
 
 // реакция на кнопку "Оплатить" в модальном окне второго шага оформления заказа
-events.on('contacts:submit', () => {
+events.on(Events.ContactsSubmit, () => {
 	api
 		.sendOrder(appData.order)
 		.then((result) => {
@@ -194,16 +210,16 @@ events.on('contacts:submit', () => {
 				content: success.render({ total: result.total }),
 			});
 		})
-		.catch((err) => console.log(err));
+		.catch(console.error);
 });
 
 // блокировка прокрутки страницы если открыто модальное окно
-events.on('modal:open', () => {
+events.on(Events.ModalOpen, () => {
 	page.locked = true;
 });
 
 // разблокировка
-events.on('modal:close', () => {
+events.on(Events.ModalClose, () => {
 	page.locked = false;
 });
 
@@ -213,4 +229,4 @@ api
 	.then((data) => {
 		appData.setProducts(data);
 	})
-	.catch((err) => console.log(err));
+	.catch(console.error);

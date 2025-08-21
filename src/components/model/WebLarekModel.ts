@@ -85,12 +85,24 @@ export class WebLarekState extends Model<IWebLarekState> implements IWebLarekSta
 
 	validateContacts(): void {
 		const errors: typeof this.formErrors = {};
+
+		// Валидация email
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!this.order.email) {
 			errors.email = settings.formErrors.email;
+		} else if (!emailRegex.test(this.order.email)) {
+			errors.email = settings.formErrors.emailInvalid;
 		}
+
+		// Валидация телефона (минимум 10 цифр, могут быть пробелы, скобки и дефисы)
+		const phoneRegex = /^(?:\+7|7|8)[\s\-\(]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/;
+		const digitsOnly = this.order.phone.replace(/\D/g, '');
 		if (!this.order.phone) {
 			errors.phone = settings.formErrors.phone;
+		} else if (digitsOnly.length < 10 || !phoneRegex.test(this.order.phone)) {
+			errors.phone = settings.formErrors.phoneInvalid;
 		}
+
 		this.formErrors = errors;
 		this.events.emit('contactsFormErrors:change', this.formErrors);
 	}

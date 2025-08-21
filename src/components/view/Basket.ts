@@ -26,18 +26,22 @@ export class Basket extends Component<IBasket> implements IBasket {
 	set items(items: HTMLElement[]) {
 		if (items.length) {
 			this._basketList.replaceChildren(...items);
-			this.setDisabled(this._button, false);
+			this.toggleButton(false);
 		} else {
 			this._basketList.replaceChildren(
 				createElement<HTMLParagraphElement>('p', {
 					textContent: settings.basket.empty,
 				})
 			);
-			this.setDisabled(this._button, true);
+			this.toggleButton(true);
 		}
 	}
 
 	set total(value: number) {
 		this.setText(this._total, formatNumber(value) + ' ' + settings.currency);
+	}
+
+	toggleButton(state: boolean) {
+		this.setDisabled(this._button, state);
 	}
 }

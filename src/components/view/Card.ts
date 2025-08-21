@@ -52,7 +52,7 @@ export class Card extends Component<ICard> implements ICard {
 		let priceText = '';
 		if (!value) {
 			priceText = settings.card.noPrice;
-			this.setDisabled(this._button, true);
+			this.toggleButton(true);
 		} else {
 			priceText = formatNumber(value) + ' ' + settings.currency;
 		}
@@ -66,7 +66,7 @@ export class Card extends Component<ICard> implements ICard {
 	changeButton(price: Price, inBasket: boolean): void {
 		if (!price) {
 			this.setText(this._button, settings.buyButtonValues.disabled);
-			this.setDisabled(this._button, true);
+			this.toggleButton(true);
 		} else {
 			if (inBasket) {
 				this.setText(this._button, settings.buyButtonValues.delete);
@@ -74,5 +74,9 @@ export class Card extends Component<ICard> implements ICard {
 				this.setText(this._button, settings.buyButtonValues.add);
 			}
 		}
+	}
+
+	toggleButton(state: boolean) {
+		this.setDisabled(this._button, state);
 	}
 }
